@@ -100,22 +100,28 @@ button {
 
 
 <?php
-    
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        
-        $usernameInput = $_POST["username"];
-        $passwordInput = $_POST["password"];
+$conn = new mysqli("127.0.0.1","admin","test","baza");
 
-      
-        if ($usernameInput === "admin" && $passwordInput === "test") {
-            $message = "Zalogowano prawidlowo";
-            echo "<script type='text/javascript'>alert('$message');</script>";
-        } 
-        else {
-            $message = "Błąd, wprowadzono złe dane";
-            echo "<script type='text/javascript'>alert('$message');</script>";
-        }
+if ($conn->connect_error) {
+    die("Błąd połączenia bazy: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $login = $conn->real_escape_string($_POST["username"]);
+    $pass = $conn->real_escape_string($_POST["password"]);
+
+
+    $query = "SELECT * FROM users WHERE login='$login' AND password='$pass'";
+    $result = $conn->query($query);
+
+    if ($result->num_rows > 0) {
+        echo "Zalogowano";
+    } else {
+        echo "Błąd logowania";
     }
+
+    $conn->close();
+}
 ?>
 
 </body>
